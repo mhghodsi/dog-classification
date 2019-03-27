@@ -28,6 +28,24 @@ def get_classes():
         classes.append(f.split(".")[1].replace("_", " "))
     return classes
 
+def VGG16_predict(img_path):
+    img = Image.open(img_path)
+    transform_pipeline = transforms.Compose([
+                                        transforms.Resize(256),
+                                        transforms.CenterCrop(224),
+                                        transforms.ToTensor(),
+                                        transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                                              std=[0.229, 0.224, 0.225])])
+    # pre-process the image
+    img = transform_pipeline(img)
+    img = img.unsqueeze(0).to(device)
+    # change the image tensor to a variable
+    img = Variable(img)
+
+    prediction = VGG16(img)
+    prediction = prediction.data.cpu().numpy().argmax()
+    return prediction # predicted class index
+
 def predict_breed_transfer(img_path, class_names):
     # load the image and return the predicted breed
     img = Image.open(img_path)
